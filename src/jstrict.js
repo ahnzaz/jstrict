@@ -309,7 +309,12 @@ function Class(opt) {
                         continue;
                     }
 
-                    // Given member is a Method
+                    /********************************************************************************/
+                    /*                                                                              */
+                    /* If given field declare Method.
+                    /*                                                                              */
+                    /*                                                                              */
+                    /********************************************************************************/
                     else if (tknParams = rxMethod.exec(strDeclaredName)) {
 
                         // Print parameters
@@ -564,6 +569,27 @@ function Class(opt) {
                 }
             })();	// End of parsing properties.
 
+            /**
+             * Alternative of prototype of member method. <br />
+             * 멤버 메소드의 prototype을 이 값으로 변경해 준다. <br />
+             * 다른 곳에서 유용하게 사용할 각종 필드를 가지고 있다. <br />
+             */
+            var objFunctionPrototypeOrigin = {
+
+                /**
+                 * Hidden field
+                 */
+                '' : {
+
+                    /**
+                     * This field will be filled as instance when created. <br />
+                     * 이 Origin 필드는 인스턴스가 생성될 때 그 instance를 넣어준다. <br />
+                     * 이 필드를 통해 각 method들은 자신을 호출한 method의 소유자를 알 수 있다. <br />
+                     */
+                    origin : null
+                }
+            };
+
 
             /* #Build proxy Class */
             var
@@ -759,6 +785,24 @@ function Class(opt) {
                                     this[iNt] = clone(objMemberContainer["protected"][iNt].value);
                             }
                         }
+                        // Set toss function to delegate handling upper scope variable to upper container.
+                        for (var iNt in objMemberContainer["public"]) {
+                            if (objMemberContainer["public"][iNt].static == false) {
+                                if (typeof objMemberContainer["public"][iNt].value == 'function') {
+
+                                } else {
+                                    Object.defineProperty(this, iNt, {
+                                        get: function () {
+                                            return Object.getPrototypeOf(this)[iNt];
+                                        },
+                                        set: function (newValue) {
+                                            return Object.getPrototypeOf(this)[iNt] = newValue;
+                                        }
+                                    });
+                                }
+
+                            }
+                        }
                     };
                     protectedContainer.prototype = new funcDynamicPublicContainer();
                     protectedContainer.prototype.constructor = protectedContainer;
@@ -812,6 +856,43 @@ function Class(opt) {
                                     this[iNt] = clone(objMemberContainer["private"][iNt].value);
                             }
                         }
+                        // Set toss function to delegate handling upper scope variable to upper container.
+                        for (var iNt in objMemberContainer["public"]) {
+                            if (objMemberContainer["public"][iNt].static == false) {
+                                if (typeof objMemberContainer["public"][iNt].value == 'function') {
+
+                                } else {
+                                    Object.defineProperty(this, iNt, {
+                                        get: function () {
+                                            return Object.getPrototypeOf(this)[iNt];
+                                        },
+                                        set: function (newValue) {
+                                            return Object.getPrototypeOf(this)[iNt] = newValue;
+                                        }
+                                    });
+                                }
+
+                            }
+                        }
+
+                        // Set toss function to delegate handling upper scope variable to upper container.
+                        for (var iNt in objMemberContainer["protected"]) {
+                            if (objMemberContainer["protected"][iNt].static == false) {
+                                if (typeof objMemberContainer["protected"][iNt].value == 'function') {
+
+                                } else {
+                                    Object.defineProperty(this, iNt, {
+                                        get: function () {
+                                            return Object.getPrototypeOf(this)[iNt];
+                                        },
+                                        set: function (newValue) {
+                                            return Object.getPrototypeOf(this)[iNt] = newValue;
+                                        }
+                                    });
+                                }
+
+                            }
+                        }
                     };
                     privateContainer.prototype = funcDynamicProtectedConstructor();
                     privateContainer.prototype.constructor = privateContainer;
@@ -861,6 +942,9 @@ function Class(opt) {
 
                 var proxy = funcDynamicPrivateConstructor();
 
+                // Inject proxy instance to hidden field container.
+                objFunctionPrototypeOrigin[''].origin = proxy;
+
                 // Constructor Binding
                 if (objConstructorContainer.length > 0) {
                     var iArgsLength = arguments.length;
@@ -868,7 +952,7 @@ function Class(opt) {
 
                     if (iArgsLength == 0) {
                         fConsFlag = true;
-                        objConstructorContainer[iArgsLength][0].value.apply(proxy, arguments);
+                        objConstructorContainer[iArgsLength][0].value.apply(proxy, Array.prototype.slice.call(arguments));
                         return Object.getPrototypeOf(Object.getPrototypeOf(proxy));
                     } else {
                         if (objConstructorContainer[iArgsLength]) {
