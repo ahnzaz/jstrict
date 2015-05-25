@@ -97,6 +97,13 @@ Function.prototype.extractBody = function () {
  * @created 2013-11-25
  */
 function Class(opt) {
+
+    var Log = function(){};
+    Log.d = function (_tag, _text) {
+        if (__DEBUG__) {
+            console.log("[" + tag + "] : " + _text);
+        }
+    };
     /**
      * Clone utility
      *
