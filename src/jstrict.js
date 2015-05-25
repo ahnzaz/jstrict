@@ -194,7 +194,7 @@ function Class(opt) {
 
         /**
          * Temporary dynamic container for parsed properties. This object contains
-         * dynamic properties when parse Class. Target class will be gain instance
+         * dynamic properties when parse objClassDefiner. Target class will be gain instance
          * data from this container by each scope.
          *
          * @since 0.1
@@ -203,13 +203,27 @@ function Class(opt) {
          */
         objMemberContainer =
         {
+            /**
+             * Public member field and method container.
+             */
             'public': {},
+
+            /**
+             * Protected member field and method container.
+             */
             'protected': {},
+
+            /**
+             * Default member field and method container. (Reserved)
+             */
             'default': {},
+
+            /**
+             * Private member field and method container.
+             */
             'private': {}
         },
 
-    // Parse properties.
         /**
          * Properties name array of given object.
          *
@@ -218,14 +232,19 @@ function Class(opt) {
          */
         aryProtoPropertiesName = null;
 
+    // Parse properties.
     switch (arguments.length) {
+
+    /**
+     * Do nothing with zero length arguments.
+     */
         case 0:
         {
             break;
         }
 
     /**
-     * Class(Declaring object)
+     * Class(objClassDefiner:Object)
      *
      * @since 0.1
      * @created 2013-12-06
@@ -236,7 +255,7 @@ function Class(opt) {
         } // End of Class(properties)
 
     /**
-     * Class(_strName, _objDeclare)
+     * Class(_strName:String, _objDeclare:Object)
      *
      * @param _strName :
      *            Name of class declaration
