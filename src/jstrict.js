@@ -13,6 +13,25 @@ Function.prototype.extractBody = function () {
 (function (_win) {
     var jStrict = function () {};
 
+    jStrict.util = function() {};
+
+    jStrict.exception = {};
+
+    jStrict.exception.grammar = {};
+
+    /**
+     * Exception for prohibited scope access. <br />
+     * @param _object Prohibited object instance.
+     * @param _varName Name of variable.
+     * @param _scope Scope of variable.
+     * @constructor
+     */
+    jStrict.exception.grammar.ScopeException = function(_object, _varName, _scope)
+    {
+
+    };
+
+
     /**
      * #Utility.
      * To merge object.
