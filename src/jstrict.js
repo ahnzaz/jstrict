@@ -176,7 +176,7 @@ function Class(opt) {
          * @since 0.1
          * @added 2014-01-28
          */
-        objDeclaredContainer = null,
+        objClassDefiner = null,
 
         /**
          * Constructor container which contains parsed constructor function
@@ -249,9 +249,9 @@ function Class(opt) {
         {
             strClassName = arguments[0];
 
-            objDeclaredContainer = arguments[1];
+            objClassDefiner = arguments[1];
 
-            aryProtoPropertiesName = Object.getOwnPropertyNames(objDeclaredContainer);
+            aryProtoPropertiesName = Object.getOwnPropertyNames(objClassDefiner);
 
 
             (function parseProperties() {
@@ -317,8 +317,8 @@ function Class(opt) {
 
                         // Refine constructor function.
                         objConstructor.value = objConstructor.args.length > 0 ?
-                            new Function(objConstructor.args, strClassName, objDeclaredContainer[strDeclaredName].extractBody())
-                            : new Function(strClassName, objDeclaredContainer[strDeclaredName].extractBody());
+                            new Function(objConstructor.args, strClassName, objClassDefiner[strDeclaredName].extractBody())
+                            : new Function(strClassName, objClassDefiner[strDeclaredName].extractBody());
 
                         // Prepare constructor array
                         if (objConstructorContainer[iArgCount] === undefined)
@@ -452,7 +452,7 @@ function Class(opt) {
                         {
                             static: fStatic || false,
                             final: fFinal || false,
-                            value: objDeclaredContainer[strDeclaredName],
+                            value: objClassDefiner[strDeclaredName],
                             types: arrTypes,
                             names: arrNames,
                             result: strReturnType
@@ -574,7 +574,7 @@ function Class(opt) {
                         {
                             static: fStatic || false,
                             final: fFinal || false,
-                            value: objDeclaredContainer[strDeclaredName]
+                            value: objClassDefiner[strDeclaredName]
                         };
                         // End of property injection
                         continue;
