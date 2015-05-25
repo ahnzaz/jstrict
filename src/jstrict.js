@@ -11,7 +11,7 @@ Function.prototype.extractBody = function () {
  * Initializing.
  */
 (function (_win) {
-    var j$trict = function () {};
+    var jStrict = function () {};
 
     /**
      * #Utility.
@@ -19,7 +19,7 @@ Function.prototype.extractBody = function () {
      * Fore given object will override all members.
      * @param _objSuper
      */
-    j$trict.merge = function (_objSuper, _objChild) {
+    jStrict.merge = function (_objSuper, _objChild) {
         var proxy = j$.clone(_objSuper);
         for (var i = 1; i < arguments.length; i++) {
             var arrChildProperties = Object.getOwnPropertyNames(arguments[i]);
@@ -36,7 +36,7 @@ Function.prototype.extractBody = function () {
      * @param _obj
      * @returns
      */
-    j$trict.clone = function (_obj) {
+    jStrict.clone = function (_obj) {
         if (!(_obj instanceof Object)) {
             return _obj;
         }
@@ -55,7 +55,7 @@ Function.prototype.extractBody = function () {
         return proxy;
     };
 
-    j$trict.log = function(_module, _tag, message)
+    jStrict.log = function(_module, _tag, message)
     {
       if(__DEBUG__)
       {
@@ -63,7 +63,7 @@ Function.prototype.extractBody = function () {
       }
     };
 
-    _win.j$ = _win.j$trict= j$trict;
+    _win.j$ = _win.j$trict= jStrict;
 
 
 })(this);
