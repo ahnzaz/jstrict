@@ -38,7 +38,7 @@ Function.prototype.extractBody = function () {
      * @since 0.1
      * @added 2015-05-26
      */
-    var logClass = function();
+    var logClass = function(){};
     logClass.putLog = function (_tag, _text) {
         console.log("[ " + _tag + " ] : " + _text);
     };
@@ -160,10 +160,7 @@ Function.prototype.extractBody = function () {
              * @added 2014-03-11 This can recognize first match, namespace and split
              *        each keyword into array.
              */
-            rxConstructor = new RegExp(
-                "^(public|protected|private)\\s"
-                + strClassName
-                + "\\(((?:(?:(?:[a-zA-Z][_a-zA-Z0-9]*)(?:\\.[a-zA-Z][_a-zA-Z0-9]*)*)\\s(?:[_a-zA-Z][_a-zA-Z0-9]*))(?:,\\s(?:(?:(?:[a-zA-Z][_a-zA-Z0-9]*)(?:\\.[a-zA-Z][_a-zA-Z0-9]*)*)\\s(?:[_a-zA-Z][_a-zA-Z0-9]*)))*)?\\)$"),
+            rxConstructor = null,
 
             /**
              * Regexp for extracting methods This return : ["keywords", "method name",
@@ -288,6 +285,12 @@ Function.prototype.extractBody = function () {
             case 2:
             {
                 strClassName = arguments[0];
+
+                // Constructor regular expression define.
+                rxConstructor = new RegExp(
+                    "^(public|protected|private)\\s"
+                    + strClassName
+                    + "\\(((?:(?:(?:[a-zA-Z][_a-zA-Z0-9]*)(?:\\.[a-zA-Z][_a-zA-Z0-9]*)*)\\s(?:[_a-zA-Z][_a-zA-Z0-9]*))(?:,\\s(?:(?:(?:[a-zA-Z][_a-zA-Z0-9]*)(?:\\.[a-zA-Z][_a-zA-Z0-9]*)*)\\s(?:[_a-zA-Z][_a-zA-Z0-9]*)))*)?\\)$");
 
                 objClassDefiner = arguments[1];
 
