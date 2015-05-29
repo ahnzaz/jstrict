@@ -1,9 +1,3 @@
-
-
-Function.prototype.extractBody = function () {
-    return this.toString().match(/{[\w\W]*}$/);
-};
-
 /**
  * Initializing.
  */
@@ -31,6 +25,10 @@ Function.prototype.extractBody = function () {
     jStrict.exception.grammar.ScopeException = function(_object, _varName, _scope)
     {
 
+    };
+
+    var extractFunctionBody = function () {
+        return this.toString().match(/{([\w\W]*)}$/);
     };
 
     /**
@@ -779,18 +777,22 @@ Function.prototype.extractBody = function () {
                                         // Redefine function to inject Static container into closure scope
                                         var funcExec = null;
                                         if (objMemberContainer["public"][iNt].names.length > 0)
-                                            funcExec = new Function(objMemberContainer["public"][iNt].names, strClassName, objMemberContainer["public"][iNt].value.toString().match(/{[\W\w]*}$/));
+                                            funcExec = new Function(objMemberContainer["public"][iNt].names, strClassName, extractFunctionBody.call(objMemberContainer["public"][iNt].value));
                                         else
-                                            funcExec = new Function(strClassName, objMemberContainer["public"][iNt].value.toString().match(/{[\W\w]*}$/));
+                                            funcExec = new Function(strClassName, extractFunctionBody.call(objMemberContainer["public"][iNt].value));
 
                                         return function () {
                                             // TODO Verify arguments.
-                                            if (objMemberContainer["public"][idx].names.length != arguments.length)
+
+                                            var argsArray = Array.prototype.slice.call(arguments);
+
+                                            if (objMemberContainer["public"][idx].names.length != argsArray.length)
                                                 throw new Error("Arguments count not matched.");
 
-                                            arguments[arguments.length] = objStaticContainer;
+                                            // Insert static member container to arguments
+                                            argsArray[argsArray.length] = objStaticContainer;
 
-                                            var result = funcExec.apply(this, arguments);
+                                            var result = funcExec.apply(this, argsArray);
 
                                             // TODO Handle result.
 
@@ -824,19 +826,38 @@ Function.prototype.extractBody = function () {
                                             // Redefine function to inject Static container into closure scope
                                             var funcExec = null;
                                             if (objMemberContainer["protected"][iNt].names.length > 0)
-                                                funcExec = new Function(objMemberContainer["protected"][iNt].names, strClassName, objMemberContainer["protected"][iNt].value.toString().match(/{[\W\w]*}$/));
+                                                funcExec = new Function(objMemberContainer["protected"][iNt].names, strClassName, extractFunctionBody.call(objMemberContainer["protected"][iNt].value));
                                             else
-                                                funcExec = new Function(strClassName, objMemberContainer["protected"][iNt].value.extractBody());
+                                                funcExec = new Function(strClassName, extractFunctionBody.call(objMemberContainer["protected"][iNt].value));
 
                                             return function () {
+                                                // Check scope permission
+                                                var callerInstance = null;
+                                                if(arguments.callee.caller.hasOwnProperty(''))
+                                                {
+                                                    callerInstance = arguments.callee.caller[''].origin;
+                                                    if(!callerInstance instanceof funcDynamicProtectedConstructor)
+                                                    {
+                                                        Log.d("Scope", "Private method cannot be called from another class");
+                                                        return null;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Log.d("Scope", "Private method cannot be called from another class");
+                                                    return null;
+                                                }
+
                                                 // TODO Verify arguments.
-                                                if (objMemberContainer["protected"][idx].names.length != arguments.length)
+                                                var argsArray = Array.prototype.slice.call(arguments);
+
+                                                if (objMemberContainer["protected"][idx].names.length != argsArray.length)
                                                     throw new Error("Arguments count not matched.");
 
-                                                // Insert a static container to arguments array.
-                                                arguments[arguments.length] = objStaticContainer;
+                                                // Insert static member container to arguments
+                                                argsArray[argsArray.length] = objStaticContainer;
 
-                                                var result = funcExec.apply(this, arguments);
+                                                var result = funcExec.apply(this, argsArray);
 
                                                 // TODO Handle result.
 
@@ -892,20 +913,38 @@ Function.prototype.extractBody = function () {
                                             // into closure scope
                                             var funcExec = null;
                                             if (objMemberContainer["private"][iNt].names.length > 0)
-                                                funcExec = new Function(objMemberContainer["private"][iNt].names, strClassName, objMemberContainer["private"][iNt].value.toString().match(/{[\W\w]*}$/));
+                                                funcExec = new Function(objMemberContainer["private"][iNt].names, strClassName, extractFunctionBody.call(objMemberContainer["private"][iNt].value));
                                             else
-                                                funcExec = new Function(strClassName, objMemberContainer["private"][iNt].value.toString().match(/{[\W\w]*}$/));
+                                                funcExec = new Function(strClassName, extractFunctionBody.call(objMemberContainer["private"][iNt].value));
 
                                             return function () {
+                                                // Check scope permission
+                                                var callerInstance = null;
+                                                if(arguments.callee.caller.hasOwnProperty(''))
+                                                {
+                                                    callerInstance = arguments.callee.caller[''].origin;
+                                                    if(!callerInstance instanceof funcDynamicPrivateConstructor)
+                                                    {
+                                                        Log.d("Scope", "Private method cannot be called from another class");
+                                                        return null;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Log.d("Scope", "Private method cannot be called from another class");
+                                                    return null;
+                                                }
+
                                                 // TODO Verify arguments.
-                                                if (objMemberContainer["private"][idx].names.length != arguments.length)
+                                                var argsArray = Array.prototype.slice.call(arguments);
+
+                                                if (objMemberContainer["public"][idx].names.length != argsArray.length)
                                                     throw new Error("Arguments count not matched.");
 
-                                                // Insert a static container to arguments array
-                                                arguments[arguments.length] = objStaticContainer;
+                                                // Insert static member container to arguments
+                                                argsArray[argsArray.length] = objStaticContainer;
 
-                                                // TODO Execute function.
-                                                var result = funcExec.apply(this, arguments);
+                                                var result = funcExec.apply(this, argsArray);
 
                                                 // TODO Handle result.
 
@@ -1015,7 +1054,7 @@ Function.prototype.extractBody = function () {
                         if (iArgsLength == 0) {
                             fConsFlag = true;
                             objConstructorContainer[iArgsLength][0].value.apply(proxy, Array.prototype.slice.call(arguments));
-                            return Object.getPrototypeOf(Object.getPrototypeOf(proxy));
+                            return proxy;
                         } else {
                             if (objConstructorContainer[iArgsLength]) {
                                 for (var iCon in objConstructorContainer[iArgsLength]) {
@@ -1028,11 +1067,11 @@ Function.prototype.extractBody = function () {
                                     if (fVerify) {
                                         fConsFlag = true;
                                         objConstructorContainer[iArgsLength][iCon].value.apply(proxy, arguments);
-                                        return Object.getPrototypeOf(Object.getPrototypeOf(proxy));
+                                        return proxy;
                                     }
                                 }
 
-                                // No fittable constructor found.
+                                // No matched constructor found.
                                 if (__DEBUG__)
                                     console.log("There is no constructor");
                                 return null;
