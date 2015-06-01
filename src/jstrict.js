@@ -838,7 +838,7 @@
                                             var proxyFunction = function () {
                                                 // Check scope permission
                                                 var callerInstance = null;
-                                                if(arguments.callee.caller.caller.hasOwnProperty(''))
+                                                if(arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty(''))
                                                 {
                                                     callerInstance = arguments.callee.caller.caller[''].origin;
                                                     if(!callerInstance instanceof funcDynamicProtectedConstructor)
@@ -930,7 +930,7 @@
                                             var proxyFunction = function () {
                                                 // Check scope permission
                                                 var callerInstance = null;
-                                                if(arguments.callee.caller.caller.hasOwnProperty(''))
+                                                if(arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty(''))
                                                 {
                                                     callerInstance = arguments.callee.caller.caller[''].origin;
                                                     if(!callerInstance instanceof funcDynamicPrivateConstructor)
