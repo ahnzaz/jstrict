@@ -22,7 +22,7 @@
      * @param _scope Scope of variable.
      * @constructor
      */
-    jStrict.exception.grammar.ScopeException = function(_object, _varName, _scope)
+    var ScopeException = jStrict.exception.grammar.ScopeException = function(_object, _varName, _scope)
     {
 
     };
@@ -38,7 +38,7 @@
      */
     var logClass = function(){};
     logClass.putLog = function (_tag, _text) {
-        console.log("[ " + _tag + " ] : " + _text);
+        console.log("[" + _tag + "] : " + _text);
     };
     logClass.d = function (_tag, _text) {
         if (__DEBUG__) {
@@ -101,7 +101,7 @@
 
 
     /**
-     * Class manufacturing function
+     * Generic class manufacturing function
      *
      * @desc Class
      * @param opt
@@ -110,12 +110,7 @@
      */
     var classBuilder = function(opt) {
 
-        var Log = function(){};
-        Log.d = function (_tag, _text) {
-            if (__DEBUG__) {
-                console.log("[" + _tag + "] : " + _text);
-            }
-        };
+        var Log = logClass;
         /**
          * Clone utility
          *
@@ -1091,13 +1086,11 @@
                                 }
 
                                 // No matched constructor found.
-                                if (__DEBUG__)
-                                    console.log("There is no constructor");
+                                Log.d("Constructor", "There is no matched constructor");
                                 return null;
                             } else {
                                 // Throw no constructor exception
-                                if (__DEBUG__)
-                                    console.log("There is no constructor");
+                                Log.d("Constructor", "There is no matched constructor");
                                 return null;
                             }
                         }
@@ -1133,6 +1126,42 @@
 
     // Class builder injection;
     if("Class" in _win === false) {
+        _win.Class = classBuilder;
+    }
+
+    /**
+     * Abstract class manufacturing function
+     * @param opt
+     * @since 0.1
+     * @created 2015-06-02
+     */
+    var abstractClassBuilder = function(opt)
+    {
+        switch(arguments.length)
+        {
+            case 0:
+            {
+                break;
+            }
+
+            case 1:
+            {
+                break;
+            }
+
+            case 2 :
+            {
+                break;
+            }
+            case 3:
+            {
+                break;
+            }
+        }
+
+    };
+    jStrict.AbstractClass = abstractClassBuilder;
+    if("AbstractClass" in _win === false) {
         _win.Class = classBuilder;
     }
 
