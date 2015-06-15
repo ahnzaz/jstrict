@@ -27,6 +27,12 @@
 
     };
 
+
+    var KeywordException = jStrict.exception.grammer.KeywordException = function(_option)
+    {
+
+    };
+
     var extractFunctionBody = function () {
         return this.toString().match(/{([\w\W]*)}$/)[1];
     };
@@ -36,22 +42,24 @@
      * @since 0.1
      * @added 2015-05-26
      */
-    var logClass = function(){};
-    logClass.putLog = function (_tag, _text) {
-        console.log("[" + _tag + "] : " + _text);
-    };
-    logClass.d = function (_tag, _text) {
-        if (__DEBUG__) {
+    {
+        var logClass = function(){};
+        logClass.putLog = function (_tag, _text) {
+            console.log("[" + _tag + "] : " + _text);
+        };
+        logClass.d = function (_tag, _text) {
+            if (__DEBUG__) {
+                this.putLog(_tag, _text);
+            }
+        }.bind(logClass);
+
+        logClass.i = function (_tag, _text) {
             this.putLog(_tag, _text);
-        }
-    }.bind(logClass);
+        }.bind(logClass);
 
-    logClass.i = function (_tag, _text) {
-        this.putLog(_tag, _text);
-    }.bind(logClass);
-
-    jStrict.util.log = function(){};
-    jStrict.util.log.Log = logClass;
+        jStrict.util.log = function(){};
+        var Log = jStrict.util.log.Log = logClass;
+    }
 
 
     /**
@@ -98,6 +106,68 @@
 
     _win.j$ = _win.jStrict= jStrict;
 
+    /**
+     * Clone utility
+     *
+     * @since 0.1
+     * @added 2014-05-09
+     * @param obj Object to be cloned.
+     * @returns
+     */
+    var clone = jStrict.util.clone = function cloneInstance(obj) {
+        if (!(obj instanceof Object)) {
+            return obj;
+        }
+
+        var arrProps = Object.getOwnPropertyNames(obj);
+        var clone = {};
+
+        for (var i in arrProps) {
+            if (obj[arrProps[i]] instanceof Function || !(obj[arrProps[i]] instanceof Object)) {
+                clone[arrProps[i]] = obj[arrProps[i]];
+            } else
+                clone[arrProps[i]] = clone(obj[arrProps[i]]);
+        }
+
+        return clone;
+    };
+
+    var// Regular expression set to detect member constructor, field, method
+    /**
+     * Regexp for extracting member
+     *
+     * @since 0.1
+     * @added 2013-12-13
+     */
+    rxMember = /\s((?:[a-zA-Z][_a-zA-Z0-9]*.)*[a-zA-Z][_a-zA-Z0-9]*)\s([_a-zA-Z][_a-zA-Z0-9]*)/,
+
+    /**
+     * Regexp for extracting constructor
+     *
+     * @since 0.1
+     * @added 2014-03-11 This can recognize first match, namespace and split
+     *        each keyword into array.
+     */
+    rxConstructor = null,
+
+    /**
+     * Regexp for extracting methods This return : ["keywords", "method name",
+     * "arguments"]
+     *
+     * @since 0.1
+     * @added 2013-12-13
+     * @modif 2014-04-15
+     */
+    rxMethod = /^((?:(?:public|protected|private|static|final)\s+)*)([_a-zA-Z][_a-zA-Z0-9]*)\s+([_a-zA-Z][_a-zA-Z0-9]*)\s*\(([_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*\s*(?:,\s*[_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*)*\s*)?\)$/,
+
+    /**
+     * Class to extend
+     *
+     * @since 0.1
+     * @created 2015-06-15
+     * @type {Function}
+     */
+    extendedClass = null;
 
 
     /**
@@ -110,61 +180,7 @@
      */
     var classBuilder = function(opt) {
 
-        var Log = logClass;
-        /**
-         * Clone utility
-         *
-         * @since 0.1
-         * @added 2014-05-09
-         * @param obj Object to be cloned.
-         * @returns
-         */
-        function clone(obj) {
-            if (!(obj instanceof Object)) {
-                return obj;
-            }
-
-            var arrProps = Object.getOwnPropertyNames(obj);
-            var proxy = {};
-
-            for (var i in arrProps) {
-                if (obj[arrProps[i]] instanceof Function || !(obj[arrProps[i]] instanceof Object)) {
-                    proxy[arrProps[i]] = obj[arrProps[i]];
-                } else
-                    proxy[arrProps[i]] = clone(obj[arrProps[i]]);
-            }
-
-            return proxy;
-        }
-
         var
-            /**
-             * Regexp for extracting member
-             *
-             * @since 0.1
-             * @added 2013-12-13
-             */
-            rxMember = /\s((?:[a-zA-Z][_a-zA-Z0-9]*.)*[a-zA-Z][_a-zA-Z0-9]*)\s([_a-zA-Z][_a-zA-Z0-9]*)/,
-
-            /**
-             * Regexp for extracting constructor
-             *
-             * @since 0.1
-             * @added 2014-03-11 This can recognize first match, namespace and split
-             *        each keyword into array.
-             */
-            rxConstructor = null,
-
-            /**
-             * Regexp for extracting methods This return : ["keywords", "method name",
-             * "arguments"]
-             *
-             * @since 0.1
-             * @added 2013-12-13
-             * @modif 2014-04-15
-             */
-            rxMethod = /^((?:(?:public|protected|private|static|final)\s+)*)([_a-zA-Z][_a-zA-Z0-9]*)\s+([_a-zA-Z][_a-zA-Z0-9]*)\s*\(([_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*\s*(?:,\s*[_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*)*\s*)?\)$/,
-
             /**
              * Class proxy object
              *
@@ -192,12 +208,12 @@
             /**
              * Constructor container which contains parsed constructor function
              * [{ :
-	 * 		Index means count of constructor's arguments
-	 * 		.scope : Scope of constructor function
-	 * 		.type : (Array)
-	 * 		.name : (Array)
-	 * 		.value : Function body
-	 * }]
+             *  	Index means count of constructor's arguments
+             * 		.scope : Scope of constructor function
+	         * 		.type : (Array)
+             * 		.name : (Array)
+             * 		.value : Function body
+             * }]
              * @since 0.1
              * @added 2014-03-17
              */
@@ -298,8 +314,7 @@
                          */
                         var strDeclaredName = aryProtoPropertiesName[i];
 
-                        if (__DEBUG__)
-                            console.log("Original Declaration : " + strDeclaredName);
+                        Log.d("Declared member string", strDeclaredName);
 
                         /*
                          * Contains keyword such as 'public, private' etc.
@@ -373,8 +388,7 @@
                         else if (tknParams = rxMethod.exec(strDeclaredName)) {
 
                             // Print parameters
-                            if (__DEBUG__)
-                                console.log("Method found" + tknParams);
+                            Log.d("Parse Method", tknParams);
 
                             var strDeclaration = tknParams.shift(); // Original declaration
                             // string.
@@ -499,8 +513,7 @@
 
                         // Given member is a Member
                         else if (tknParams = rxMember.exec(strDeclaredName)) {
-                            if (__DEBUG__)
-                                console.log("Member found : " + strDeclaredName);
+                            Log.d("Parse Member", strDeclaredName);
 
                             // Split to tokens
                             tknKeywords = strDeclaredName.split(" ");
@@ -1165,7 +1178,6 @@
         _win.Class = classBuilder;
     }
 
-
     /**
      * Extend function to Get a protected and public member from super class.
      *
@@ -1174,11 +1186,13 @@
      * @param _funcSuper
      * @returns
      */
-    function Extends(_funcSuper) {
-        if (typeof _funcSuper == "function")
-            return _funcSuper();
-        if (typeof _funcSuper == "string")
-            return eval(_funcSuper + "();");
+    var Extends = jStrict.extends = function(_funcSuper) {
+        if (typeof _funcSuper == "function") {
+            extendedClass = _funcSuper;
+        }
+        else {
+            throw new GrammarException();
+        }
     }
 
 })(this);
