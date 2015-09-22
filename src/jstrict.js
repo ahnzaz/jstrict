@@ -7,35 +7,27 @@
      */
     var __DEBUG__ = true;
 
-    var jStrict = function () {};
-
-    jStrict.util = function() {};
-
-    jStrict.exception = {};
-
-    jStrict.exception.grammar = {};
+    var jStrict = function () {
+    };
 
     /**
-     * Exception for prohibited scope access. <br />
-     * @param _object Prohibited object instance.
-     * @param _varName Name of variable.
-     * @param _scope Scope of variable.
-     * @constructor
+     * Utility package
+     * @since 1.0
+     * @added 2015-09-22
      */
-    var ScopeException = jStrict.exception.grammar.ScopeException = function(_object, _varName, _scope)
-    {
+    var utilPkg = (function (jStrictPkg) {
 
-    };
+        var extractFunctionBody = function () {
+            return this.toString().match(/{([\w\W]*)}$/)[1];
+        };
 
+        if(!jStrictPkg.util) {
+            jStrictPkg.util = {
+                extractFunctionBody: extractFunctionBody
+            }
+        }
+    }(jStrict));
 
-    var KeywordException = jStrict.exception.grammer.KeywordException = function(_option)
-    {
-
-    };
-
-    var extractFunctionBody = function () {
-        return this.toString().match(/{([\w\W]*)}$/)[1];
-    };
 
     /**
      * Log utility class. <br />
@@ -43,7 +35,8 @@
      * @added 2015-05-26
      */
     {
-        var logClass = function(){};
+        var logClass = function () {
+        };
         logClass.putLog = function (_tag, _text) {
             console.log("[" + _tag + "] : " + _text);
         };
@@ -57,7 +50,8 @@
             this.putLog(_tag, _text);
         }.bind(logClass);
 
-        jStrict.util.log = function(){};
+        jStrict.util.log = function () {
+        };
         var Log = jStrict.util.log.Log = logClass;
     }
 
@@ -104,7 +98,7 @@
         return proxy;
     };
 
-    _win.j$ = _win.jStrict= jStrict;
+    _win.j$ = _win.jStrict = jStrict;
 
     /**
      * Clone utility
@@ -133,41 +127,41 @@
     };
 
     var// Regular expression set to detect member constructor, field, method
-    /**
-     * Regexp for extracting member
-     *
-     * @since 0.1
-     * @added 2013-12-13
-     */
-    rxMember = /\s((?:[a-zA-Z][_a-zA-Z0-9]*.)*[a-zA-Z][_a-zA-Z0-9]*)\s([_a-zA-Z][_a-zA-Z0-9]*)/,
+        /**
+         * Regexp for extracting member
+         *
+         * @since 0.1
+         * @added 2013-12-13
+         */
+        rxMember = /^((?:(?:public|protected|private|static|final)\s+)*)([_a-zA-Z][_a-zA-Z0-9]*)\s+([_a-zA-Z][_a-zA-Z0-9]*)\s*$/,
 
-    /**
-     * Regexp for extracting constructor
-     *
-     * @since 0.1
-     * @added 2014-03-11 This can recognize first match, namespace and split
-     *        each keyword into array.
-     */
-    rxConstructor = null,
+        /**
+         * Regexp for extracting constructor
+         *
+         * @since 0.1
+         * @added 2014-03-11 This can recognize first match, namespace and split
+         *        each keyword into array.
+         */
+        rxConstructor = null,
 
-    /**
-     * Regexp for extracting methods This return : ["keywords", "method name",
-     * "arguments"]
-     *
-     * @since 0.1
-     * @added 2013-12-13
-     * @modif 2014-04-15
-     */
-    rxMethod = /^((?:(?:public|protected|private|static|final)\s+)*)([_a-zA-Z][_a-zA-Z0-9]*)\s+([_a-zA-Z][_a-zA-Z0-9]*)\s*\(([_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*\s*(?:,\s*[_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*)*\s*)?\)$/,
+        /**
+         * Regexp for extracting methods This return : ["keywords", "method name",
+         * "arguments"]
+         *
+         * @since 0.1
+         * @added 2013-12-13
+         * @modif 2014-04-15
+         */
+        rxMethod = /^((?:(?:public|protected|private|static|final)\s+)*)([_a-zA-Z][_a-zA-Z0-9]*)\s+([_a-zA-Z][_a-zA-Z0-9]*)\s*\(([_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*\s*(?:,\s*[_a-zA-Z][_a-zA-Z0-9]*(?:\.[_a-zA-Z][_a-zA-Z0-9]*)*\s*[_a-zA-Z][_a-zA-Z0-9]*)*\s*)?\)$/,
 
-    /**
-     * Class to extend
-     *
-     * @since 0.1
-     * @created 2015-06-15
-     * @type {Function}
-     */
-    extendedClass = null;
+        /**
+         * Class to extend
+         *
+         * @since 0.1
+         * @created 2015-06-15
+         * @type {Function}
+         */
+        extendedClass = null;
 
 
     /**
@@ -178,7 +172,7 @@
      * @since 0.1
      * @created 2013-11-25
      */
-    var classBuilder = function(opt) {
+    var classBuilder = function (opt) {
 
         var
             /**
@@ -639,22 +633,22 @@
 
                 /**
                  * Alternative of prototype of member method. <br />
-                 * Î©§Î≤Ñ Î©îÏÜåÎìúÏùò prototypeÏùÑ Ïù¥ Í∞íÏúºÎ°ú Î≥ÄÍ≤ΩÌï¥ Ï§ÄÎã§. <br />
-                 * Îã§Î•∏ Í≥≥ÏóêÏÑú Ïú†Ïö©ÌïòÍ≤å ÏÇ¨Ïö©Ìï† Í∞ÅÏ¢Ö ÌïÑÎìúÎ•º Í∞ÄÏßÄÍ≥† ÏûàÎã§. <br />
+                 * Î©§Î≤Ñ Î©îÏÜå?ìú?ùò prototype?ùÑ ?ù¥ Í∞íÏúºÎ°? Î≥?Í≤ΩÌï¥ Ï§??ã§. <br />
+                 * ?ã§Î•? Í≥≥Ïóê?Ñú ?ú†?ö©?ïòÍ≤? ?Ç¨?ö©?ï† Í∞ÅÏ¢Ö ?ïÑ?ìúÎ•? Í∞?Ïß?Í≥? ?ûà?ã§. <br />
                  */
                 var objFunctionPrototypeOrigin = {
 
                     /**
                      * Hidden field
                      */
-                    '' : {
+                    '': {
 
                         /**
                          * This field will be filled as instance when created. <br />
-                         * Ïù¥ Origin ÌïÑÎìúÎäî Ïù∏Ïä§ÌÑ¥Ïä§Í∞Ä ÏÉùÏÑ±Îê† Îïå Í∑∏ instanceÎ•º ÎÑ£Ïñ¥Ï§ÄÎã§. <br />
-                         * Ïù¥ ÌïÑÎìúÎ•º ÌÜµÌï¥ Í∞Å methodÎì§ÏùÄ ÏûêÏã†ÏùÑ Ìò∏Ï∂úÌïú methodÏùò ÏÜåÏú†ÏûêÎ•º Ïïå Ïàò ÏûàÎã§. <br />
+                         * ?ù¥ Origin ?ïÑ?ìú?äî ?ù∏?ä§?Ñ¥?ä§Í∞? ?Éù?Ñ±?ê† ?ïå Í∑? instanceÎ•? ?Ñ£?ñ¥Ï§??ã§. <br />
+                         * ?ù¥ ?ïÑ?ìúÎ•? ?Üµ?ï¥ Í∞? method?ì§?? ?ûê?ã†?ùÑ ?ò∏Ï∂úÌïú method?ùò ?Üå?ú†?ûêÎ•? ?ïå ?àò ?ûà?ã§. <br />
                          */
-                        origin : null
+                        origin: null
                     }
                 };
 
@@ -846,17 +840,14 @@
                                             var proxyFunction = function () {
                                                 // Check scope permission
                                                 var callerInstance = null;
-                                                if(arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty(''))
-                                                {
+                                                if (arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty('')) {
                                                     callerInstance = arguments.callee.caller.caller[''].origin;
-                                                    if(!callerInstance instanceof funcDynamicProtectedConstructor)
-                                                    {
+                                                    if (!callerInstance instanceof funcDynamicProtectedConstructor) {
                                                         Log.d("Scope", "Protected method cannot be called from another class");
                                                         return null;
                                                     }
                                                 }
-                                                else
-                                                {
+                                                else {
                                                     Log.d("Scope", "Protected method cannot be called from public scope");
                                                     return null;
                                                 }
@@ -938,17 +929,14 @@
                                             var proxyFunction = function () {
                                                 // Check scope permission
                                                 var callerInstance = null;
-                                                if(arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty(''))
-                                                {
+                                                if (arguments.callee.caller.caller != null && arguments.callee.caller.caller.hasOwnProperty('')) {
                                                     callerInstance = arguments.callee.caller.caller[''].origin;
-                                                    if(!callerInstance instanceof funcDynamicPrivateConstructor)
-                                                    {
+                                                    if (!callerInstance instanceof funcDynamicPrivateConstructor) {
                                                         Log.d("Scope", "Private method cannot be called from another class");
                                                         return null;
                                                     }
                                                 }
-                                                else
-                                                {
+                                                else {
                                                     Log.d("Scope", "Private method cannot be called from public scope");
                                                     return null;
                                                 }
@@ -1138,7 +1126,7 @@
     jStrict.Class = classBuilder;
 
     // Class builder injection;
-    if("Class" in _win === false) {
+    if ("Class" in _win === false) {
         _win.Class = classBuilder;
     }
 
@@ -1148,10 +1136,8 @@
      * @since 0.1
      * @created 2015-06-02
      */
-    var abstractClassBuilder = function(opt)
-    {
-        switch(arguments.length)
-        {
+    var abstractClassBuilder = function (opt) {
+        switch (arguments.length) {
             case 0:
             {
                 break;
@@ -1174,7 +1160,7 @@
 
     };
     jStrict.AbstractClass = abstractClassBuilder;
-    if("AbstractClass" in _win === false) {
+    if ("AbstractClass" in _win === false) {
         _win.Class = classBuilder;
     }
 
@@ -1186,7 +1172,7 @@
      * @param _funcSuper
      * @returns
      */
-    var Extends = jStrict.extends = function(_funcSuper) {
+    var Extends = jStrict.extends = function (_funcSuper) {
         if (typeof _funcSuper == "function") {
             extendedClass = _funcSuper;
         }
